@@ -32,7 +32,8 @@ class ImageViewer:
         root.geometry("1024x768")  # 设置窗口的初始大小为1024x768
 
         if initial_dir and os.path.isdir(initial_dir):
-            self.load_images(initial_dir)
+            # self.load_images(initial_dir)
+            self.load_images_recursive(initial_dir)
             self.show_image()
 
     def open_directory(self):
@@ -86,6 +87,14 @@ class ImageViewer:
         self.images.sort()  # Optional: sort files by name
         self.current_image = 0
 
+    def load_images_recursive(self, directory):
+        self.images = []
+        for root, dirs, files in os.walk(directory):
+            for file in files:
+                if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
+                    self.images.append(os.path.join(root, file))
+        self.images.sort()  # 排序图像
+        self.current_image = 0
 
 
 if __name__ == "__main__":
