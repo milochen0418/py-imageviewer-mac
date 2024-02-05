@@ -46,7 +46,7 @@ class ImageViewer:
         if initial_dir and os.path.isdir(initial_dir):
             self.load_images_recursive(initial_dir)
             self.show_image()
-            
+
     def prev_image_event(self, event):
         self.prev_image()
 
@@ -78,7 +78,10 @@ class ImageViewer:
         max_height = 600
         if pil_image.width > max_width or pil_image.height > max_height:
             ratio = min(max_width / pil_image.width, max_height / pil_image.height)
-            pil_image = pil_image.resize((int(pil_image.width * ratio), int(pil_image.height * ratio)), Image.Resampling.LANCZOS)
+            new_width = max(1, int(pil_image.width * ratio))
+            new_height = max(1, int(pil_image.height * ratio))
+            pil_image = pil_image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+
 
         img = ImageTk.PhotoImage(pil_image)
         
