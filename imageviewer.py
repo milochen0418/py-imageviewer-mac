@@ -39,9 +39,19 @@ class ImageViewer:
         self.current_image = 0
         root.geometry("1024x768")  # 设置窗口的初始大小为1024x768
 
+        # 绑定键盘事件
+        root.bind('<Left>', self.prev_image_event)
+        root.bind('<Right>', self.next_image_event)
+
         if initial_dir and os.path.isdir(initial_dir):
             self.load_images_recursive(initial_dir)
             self.show_image()
+            
+    def prev_image_event(self, event):
+        self.prev_image()
+
+    def next_image_event(self, event):
+        self.next_image()
 
     def open_directory(self):
         directory = filedialog.askdirectory()
