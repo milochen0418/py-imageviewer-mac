@@ -1,4 +1,4 @@
-from tkinter import Tk, Label, Button, filedialog, Frame
+from tkinter import Tk, Label, Button, filedialog, Frame, Entry, messagebox
 from PIL import Image, ImageTk
 import os, sys
 
@@ -23,7 +23,15 @@ class ImageViewer:
         self.next_button = Button(self.control_frame, text="<<Prev", command=self.prev_image)
         self.next_button.pack(side="right", padx=5)
 
-        # 图像显示在下方
+        # 在控制按钮下方创建一个新框架用于放置显示路径的Entry
+        self.path_frame = Frame(root)
+        self.path_frame.pack(fill="x", side="top", pady=5)
+        
+        # 在新框架中添加一个Entry用于显示路径
+        self.path_entry = Entry(self.path_frame, state='readonly', readonlybackground='white', fg='black')
+        self.path_entry.pack(fill='x', expand=True, padx=5)
+
+        # 图像显示在路径显示的下方
         self.image_label = Label(root)
         self.image_label.pack(fill="both", expand=True, pady=5)
 
@@ -32,7 +40,6 @@ class ImageViewer:
         root.geometry("1024x768")  # 设置窗口的初始大小为1024x768
 
         if initial_dir and os.path.isdir(initial_dir):
-            # self.load_images(initial_dir)
             self.load_images_recursive(initial_dir)
             self.show_image()
 
@@ -63,13 +70,20 @@ class ImageViewer:
             ratio = min(max_width / pil_image.width, max_height / pil_image.height)
             pil_image = pil_image.resize((int(pil_image.width * ratio), int(pil_image.height * ratio)), Image.Resampling.LANCZOS)
 
-        
-
         img = ImageTk.PhotoImage(pil_image)
         
         self.image_label.config(image=img)
         self.image_label.image = img  # Keep a reference!
         self.root.title(f"Image Viewer - {os.path.basename(image_path)}")
+
+        # 显示当前图像的路径
+        self.path_entry.config(state='normal')
+        self.path_entry.delete(0, 'end')
+        self.path_entry.insert(0, image_path)
+        self.path_entry.config(state='readonly')
+        
+        # 绑定点击事件以复制路径
+        self.path_entry.bind('<Button-1>', self.copy_path_to_clipboard)        
 
     def prev_image(self):
         if self.images and self.current_image > 0:
@@ -95,6 +109,11 @@ class ImageViewer:
                     self.images.append(os.path.join(root, file))
         self.images.sort()  # 排序图像
         self.current_image = 0
+
+    def copy_path_to_clipboard(self, event=None):
+        self.root.clipboard_clear()
+        self.root.clipboard_append(self.path_entry.get())
+        messagebox.showinfo("Info", "Path copied to clipboard")
 
 
 if __name__ == "__main__":
